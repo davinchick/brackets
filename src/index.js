@@ -1,38 +1,17 @@
 module.exports = function check(str, bracketsConfig) {
-    function flatten(arr) {
-        return arr.reduce((acc, val) => Array.isArray(val) ? acc.concat(flatten(val)) : acc.concat(val), []);
+    let bracketsArr = bracketsConfig.map(el => el.join(''));
+
+    function reduceBrackets(string)  {
+        let pattern = string;
+        bracketsArr.forEach((el) => {
+                pattern = pattern.replace(el, '');
+            });
+        if (pattern.length === 0) {return true;}
+        if (string.length === pattern.length) {return false;}
+        return reduceBrackets(pattern, bracketsArr);
     }
-    let bracketsArr = flatten(bracketsConfig);
-    let newArray = ( str + bracketsArr.toString()).replace(/[^\(\)\{\}\[\]\|]/g, '').split('');
-
-    if (newArray.length===0){ return false;}
-
-    function areTheyOrdered(string){
-        var i, 
-            l = string.length, 
-            count = 0, 
-            el, 
-            latest, 
-            bracketsStack = [];
-
-        for(i=0; i<l; i++){
-            el = string[i];
-            if  (el==="{" || el==="(" || el==="[" || (el==="|" && latest!=='|')){
-                    bracketsStack.push(el);
-                    latest = el;
-                }
-            else if(el === '}' || el === ")" || el === "]" || el==="|" ){
-                if(latest){
-                    if( (el === '}' && latest === "{") || (el === ']' && latest === "[") || (el === ')' && latest === "(") || (el === '|' && latest === "|") ){
-                        bracketsStack.pop();
-                        latest = bracketsStack.length > 0 ? bracketsStack[bracketsStack.length - 1] : undefined;
-                    }
-                }else{
-                    return false;
-                }
-            }
-        }
-        return bracketsStack.length===0 && count%2===0;
-    }
-    return areTheyOrdered(newArray);
+    return reduceBrackets(str, bracketsArr);
 }
+
+// --well, previous one solution is good enought, and operates with come in handy stacks, but only for brackets :/
+// --exactly this one is works also with numbers
